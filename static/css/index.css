@@ -764,6 +764,26 @@ a:focus {
   background: #000;
 }
 
+.skill-demo-card {
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--border-radius-lg);
+  background: #fff;
+  box-shadow: var(--shadow-md);
+}
+
+.skill-demo-card video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 30 / 17;
+  background: #000;
+}
+
+.skill-demo-card .title {
+  margin: 0;
+  padding: 1rem 1.25rem;
+}
+
 .results-table {
   font-size: 0.85rem;
 }
