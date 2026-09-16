@@ -121,6 +121,15 @@ function setupVideoCarouselAutoplay() {
     });
 }
 
+function setupSkillDemoScroller() {
+    document.querySelectorAll('[data-skill-scroll]').forEach(button => {
+        button.addEventListener('click', () => {
+            const track = document.getElementById(button.getAttribute('aria-controls'));
+            track.scrollBy({ left: Number(button.dataset.skillScroll) * track.clientWidth, behavior: 'smooth' });
+        });
+    });
+}
+
 $(document).ready(function() {
     // Check for click events on the navbar burger icon
 
@@ -140,5 +149,6 @@ $(document).ready(function() {
     
     // Setup video autoplay for carousel
     setupVideoCarouselAutoplay();
+    setupSkillDemoScroller();
 
 })

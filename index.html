@@ -188,43 +188,65 @@
 
     <section class="section hero is-small is-light" id="single-skill-demos">
       <div class="container is-max-desktop">
-        <div class="content">
-          <h2 class="title is-3">Single-Skill Demos</h2>
-          <p>Individual SkillMotion trajectories from the CHOREO library, rendered on the Unitree G1 in MuJoCo.</p>
+        <div class="skill-demo-heading">
+          <div class="content">
+            <h2 class="title is-3">Single-Skill Demos</h2>
+            <p>Individual SkillMotion trajectories from the CHOREO library, rendered on the Unitree G1 in MuJoCo.</p>
+          </div>
+          <div class="skill-demo-controls" aria-label="Single-skill demo navigation">
+            <button type="button" data-skill-scroll="-1" aria-controls="skill-demo-track" aria-label="Previous demos">&#8592;</button>
+            <button type="button" data-skill-scroll="1" aria-controls="skill-demo-track" aria-label="Next demos">&#8594;</button>
+          </div>
         </div>
-        <div class="columns is-multiline">
-          <div class="column is-half">
-            <article class="skill-demo-card">
-              <video controls muted loop playsinline preload="metadata" poster="static/videos/skills/kick.jpg">
-                <source src="static/videos/skills/kick.mp4" type="video/mp4">
-              </video>
-              <h3 class="title is-5">Kick</h3>
-            </article>
-          </div>
-          <div class="column is-half">
-            <article class="skill-demo-card">
-              <video controls muted loop playsinline preload="metadata" poster="static/videos/skills/wave.jpg">
-                <source src="static/videos/skills/wave.mp4" type="video/mp4">
-              </video>
-              <h3 class="title is-5">Right-Hand Wave</h3>
-            </article>
-          </div>
-          <div class="column is-half">
-            <article class="skill-demo-card">
-              <video controls muted loop playsinline preload="metadata" poster="static/videos/skills/horse-squat.jpg">
-                <source src="static/videos/skills/horse-squat.mp4" type="video/mp4">
-              </video>
-              <h3 class="title is-5">Horse Squat</h3>
-            </article>
-          </div>
-          <div class="column is-half">
-            <article class="skill-demo-card">
-              <video controls muted loop playsinline preload="metadata" poster="static/videos/skills/dance.jpg">
-                <source src="static/videos/skills/dance.mp4" type="video/mp4">
-              </video>
-              <h3 class="title is-5">Dance</h3>
-            </article>
-          </div>
+        <div class="skill-demo-track" id="skill-demo-track" tabindex="0">
+          <article class="skill-demo-card">
+            <video controls muted loop playsinline preload="metadata" poster="static/videos/skills/kick.jpg">
+              <source src="static/videos/skills/kick.mp4" type="video/mp4">
+            </video>
+            <h3 class="title is-5">Kick</h3>
+          </article>
+          <article class="skill-demo-card">
+            <video controls muted loop playsinline preload="metadata" poster="static/videos/skills/wave.jpg">
+              <source src="static/videos/skills/wave.mp4" type="video/mp4">
+            </video>
+            <h3 class="title is-5">Right-Hand Wave</h3>
+          </article>
+          <article class="skill-demo-card">
+            <video controls muted loop playsinline preload="metadata" poster="static/videos/skills/horse-squat.jpg">
+              <source src="static/videos/skills/horse-squat.mp4" type="video/mp4">
+            </video>
+            <h3 class="title is-5">Horse Squat</h3>
+          </article>
+          <article class="skill-demo-card">
+            <video controls muted loop playsinline preload="metadata" poster="static/videos/skills/dance.jpg">
+              <source src="static/videos/skills/dance.mp4" type="video/mp4">
+            </video>
+            <h3 class="title is-5">Dance</h3>
+          </article>
+          <article class="skill-demo-card">
+            <video controls muted loop playsinline preload="metadata" poster="static/videos/skills/fighting-ready.jpg">
+              <source src="static/videos/skills/fighting-ready.mp4" type="video/mp4">
+            </video>
+            <h3 class="title is-5">Fighting Ready</h3>
+          </article>
+          <article class="skill-demo-card">
+            <video controls muted loop playsinline preload="metadata" poster="static/videos/skills/waltz.jpg">
+              <source src="static/videos/skills/waltz.mp4" type="video/mp4">
+            </video>
+            <h3 class="title is-5">Waltz</h3>
+          </article>
+          <article class="skill-demo-card">
+            <video controls muted loop playsinline preload="metadata" poster="static/videos/skills/crouch-down.jpg">
+              <source src="static/videos/skills/crouch-down.mp4" type="video/mp4">
+            </video>
+            <h3 class="title is-5">Crouch Down</h3>
+          </article>
+          <article class="skill-demo-card">
+            <video controls muted loop playsinline preload="metadata" poster="static/videos/skills/leaning-walk.jpg">
+              <source src="static/videos/skills/leaning-walk.mp4" type="video/mp4">
+            </video>
+            <h3 class="title is-5">Leaning Walk</h3>
+          </article>
         </div>
       </div>
     </section>

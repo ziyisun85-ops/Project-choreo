@@ -764,9 +764,53 @@ a:focus {
   background: #000;
 }
 
+.skill-demo-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.skill-demo-controls {
+  display: flex;
+  gap: 0.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.skill-demo-controls button {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid #d9e1ec;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.skill-demo-controls button:hover,
+.skill-demo-controls button:focus-visible {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  transform: translateY(-2px);
+}
+
+.skill-demo-track {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-color: var(--primary-color) transparent;
+  scrollbar-width: thin;
+  padding: 0.25rem 0 1.25rem;
+}
+
 .skill-demo-card {
-  height: 100%;
+  flex: 0 0 calc(50% - 0.75rem);
   overflow: hidden;
+  scroll-snap-align: start;
   border-radius: var(--border-radius-lg);
   background: #fff;
   box-shadow: var(--shadow-md);
@@ -782,6 +826,29 @@ a:focus {
 .skill-demo-card .title {
   margin: 0;
   padding: 1rem 1.25rem;
+}
+
+@media screen and (max-width: 768px) {
+  .skill-demo-heading {
+    display: block;
+  }
+
+  .skill-demo-heading .content {
+    margin-bottom: 0;
+  }
+
+  .skill-demo-heading .content p {
+    display: none;
+  }
+
+  .skill-demo-controls {
+    justify-content: flex-end;
+    padding-bottom: 1rem;
+  }
+
+  .skill-demo-card {
+    flex-basis: 88%;
+  }
 }
 
 .results-table {
