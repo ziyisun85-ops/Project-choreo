@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CHOREO — Every Humanoid Skill as a Trajectory</title>
+  <meta name="description" content="CHOREO composes heterogeneous humanoid skills into long-horizon behaviors through a unified, executable trajectory representation—without retraining.">
+  <meta name="theme-color" content="#072f49">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="CHOREO: Every Humanoid Skill as a Trajectory">
+  <meta property="og:description" content="Training-free composition of heterogeneous humanoid skills on Unitree G1.">
+  <meta property="og:image" content="https://ziyisun85-ops.github.io/Project-choreo/teaser.png">
+  <meta property="og:url" content="https://ziyisun85-ops.github.io/Project-choreo/">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23072f49%22/><path d=%22M45 18a18 18 0 1 0 0 28%22 fill=%22none%22 stroke=%22%23ff6d3a%22 stroke-width=%228%22 stroke-linecap=%22round%22/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #082b42;
+      --ink-soft: #3d5665;
+      --paper: #f5f1e9;
+      --paper-deep: #e9e2d6;
+      --blue: #176b99;
+      --orange: #f0643b;
+      --mint: #9ec9b8;
+      --line: rgba(8, 43, 66, .16);
+      --white: #fffdf9;
+      --serif: "Newsreader", Georgia, serif;
+      --sans: "Manrope", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 4%, rgba(158, 201, 184, .33), transparent 24rem),
+        linear-gradient(rgba(8, 43, 66, .035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(8, 43, 66, .035) 1px, transparent 1px),
+        var(--paper);
+      background-size: auto, 42px 42px, 42px 42px, auto;
+      font-family: var(--sans);
+      line-height: 1.65;
+    }
+    a { color: inherit; }
+    img, video { display: block; max-width: 100%; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    .shell { width: min(1160px, calc(100% - 40px)); margin: 0 auto; }
+
+    .site-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 76px;
+      border-bottom: 1px solid var(--line);
+      font-size: .82rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .brand { text-decoration: none; }
+    .brand::before { content: "●"; margin-right: .6rem; color: var(--orange); }
+    .nav-links { display: flex; gap: 1.35rem; }
+    .nav-links a { text-decoration: none; }
+    .nav-links a:hover { color: var(--orange); }
+
+    .hero { position: relative; padding: 92px 0 58px; text-align: center; overflow: hidden; }
+    .hero::before, .hero::after {
+      position: absolute;
+      z-index: -1;
+      content: "";
+      width: 290px;
+      height: 290px;
+      border: 1px dashed rgba(23, 107, 153, .36);
+      border-radius: 50%;
+    }
+    .hero::before { top: 42px; left: -130px; }
+    .hero::after { top: -155px; right: -90px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: .7rem;
+      margin-bottom: 16px;
+      color: var(--blue);
+      font-size: .74rem;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before, .eyebrow::after { content: ""; width: 38px; height: 1px; background: currentColor; }
+    h1 {
+      margin: 0;
+      font-family: var(--sans);
+      font-size: clamp(4rem, 12vw, 9rem);
+      font-weight: 800;
+      letter-spacing: -.075em;
+      line-height: .82;
+    }
+    h1 .orbit { color: var(--orange); }
+    .subtitle {
+      max-width: 790px;
+      margin: 28px auto 22px;
+      font-family: var(--serif);
+      font-size: clamp(1.8rem, 4.2vw, 3.15rem);
+      font-weight: 500;
+      line-height: 1.05;
+    }
+    .authors { max-width: 940px; margin: 32px auto 6px; font-size: 1rem; font-weight: 700; }
+    .authors a { text-decoration-color: rgba(240, 100, 59, .5); text-underline-offset: .25em; }
+    .authors span { white-space: nowrap; }
+    .affiliations { max-width: 960px; margin: 10px auto 0; color: var(--ink-soft); font-size: .82rem; }
+    .contribution { margin: 6px auto 0; color: var(--ink-soft); font-size: .75rem; }
+
+    .actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .6rem;
+      min-height: 46px;
+      padding: 0 20px;
+      border: 1px solid var(--ink);
+      border-radius: 999px;
+      color: var(--ink);
+      background: transparent;
+      font: 700 .82rem var(--sans);
+      text-decoration: none;
+      transition: transform .2s ease, color .2s ease, background .2s ease;
+    }
+    .button.primary { color: var(--white); background: var(--ink); }
+    .button:hover { color: var(--white); background: var(--orange); border-color: var(--orange); transform: translateY(-2px); }
+    .button:focus-visible, .copy:focus-visible, .nav-links a:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+
+    .teaser-wrap { position: relative; margin: 28px auto 0; }
+    .teaser-frame {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: rgba(255, 253, 249, .72);
+      box-shadow: 0 28px 80px rgba(8, 43, 66, .12);
+      backdrop-filter: blur(8px);
+    }
+    .teaser-frame img { width: 100%; border-radius: 18px; }
+    .metric-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      width: min(720px, calc(100% - 48px));
+      margin: -25px auto 0;
+      position: relative;
+      border-radius: 16px;
+      color: var(--white);
+      background: var(--ink);
+      box-shadow: 0 18px 44px rgba(8, 43, 66, .2);
+    }
+    .metric { padding: 20px 10px; }
+    .metric + .metric { border-left: 1px solid rgba(255, 255, 255, .2); }
+    .metric strong { display: block; color: #ffd4c6; font-size: clamp(1.45rem, 3vw, 2.25rem); line-height: 1; }
+    .metric span { display: block; margin-top: 8px; font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; }
+
+    section { padding: 94px 0; }
+    .section-label { color: var(--orange); font-size: .72rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    h2 { margin: 12px 0 24px; font-family: var(--serif); font-size: clamp(2.5rem, 6vw, 4.8rem); font-weight: 500; line-height: .98; letter-spacing: -.025em; }
+    h3 { margin: 0 0 10px; font-size: 1.1rem; line-height: 1.3; }
+    .lede { font-family: var(--serif); font-size: clamp(1.2rem, 2.5vw, 1.55rem); line-height: 1.45; }
+
+    .demo { padding-top: 118px; }
+    .demo-grid { display: grid; grid-template-columns: .72fr 1.28fr; gap: 54px; align-items: center; }
+    .video-card { position: relative; padding: 10px; border: 1px solid var(--line); border-radius: 22px; background: var(--white); box-shadow: 0 24px 70px rgba(8, 43, 66, .11); }
+    .video-card video { width: 100%; border-radius: 14px; background: #031621; }
+    .video-card::after { content: "UNITREE G1  /  MUJOCO"; position: absolute; right: 22px; bottom: -30px; font-size: .68rem; font-weight: 800; letter-spacing: .13em; }
+
+    .abstract { background: var(--ink); color: var(--white); }
+    .abstract-grid { display: grid; grid-template-columns: .52fr 1fr; gap: 70px; align-items: start; }
+    .abstract .section-label { color: #a9dcca; }
+    .abstract h2 { position: sticky; top: 30px; }
+    .abstract p { margin-top: 0; color: #d7e2e7; font-size: 1.03rem; }
+    .abstract p:first-child { color: var(--white); font-family: var(--serif); font-size: 1.4rem; }
+
+    .method-figure { margin: 42px 0 0; padding: 10px; border: 1px solid var(--line); border-radius: 22px; background: var(--white); }
+    .method-figure img { width: 100%; border-radius: 14px; }
+    figcaption { padding: 12px 8px 2px; color: var(--ink-soft); font-size: .76rem; text-align: center; }
+    .method-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 28px; counter-reset: idea; }
+    .idea {
+      min-height: 235px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 253, 249, .66);
+      counter-increment: idea;
+    }
+    .idea::before { content: "0" counter(idea); display: block; margin-bottom: 34px; color: var(--orange); font-weight: 800; letter-spacing: .1em; }
+    .idea p { margin-bottom: 0; color: var(--ink-soft); font-size: .9rem; }
+
+    .results { background: var(--paper-deep); }
+    .results-head { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: end; }
+    .result-callout { margin: 0; font-family: var(--serif); font-size: 1.35rem; line-height: 1.45; }
+    .table-wrap { margin-top: 40px; overflow-x: auto; border: 1px solid var(--line); border-radius: 18px; background: var(--white); }
+    table { width: 100%; border-collapse: collapse; min-width: 750px; font-size: .86rem; }
+    th, td { padding: 15px 18px; border-bottom: 1px solid var(--line); text-align: right; }
+    th:first-child, td:first-child { text-align: left; font-weight: 700; }
+    thead { color: var(--ink-soft); background: #f8f6f0; font-size: .7rem; letter-spacing: .07em; text-transform: uppercase; }
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr.choreo { color: var(--white); background: var(--ink); }
+    tbody tr.choreo td { border-color: rgba(255, 255, 255, .18); font-weight: 800; }
+
+    .citation-grid { display: grid; grid-template-columns: .65fr 1.35fr; gap: 50px; align-items: start; }
+    .bibtex { position: relative; padding: 28px; border: 1px solid var(--line); border-radius: 18px; color: #d8e6ec; background: #061d2b; overflow: auto; }
+    pre { margin: 0; font: .78rem/1.7 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre-wrap; }
+    .copy { position: absolute; top: 12px; right: 12px; padding: 8px 11px; border: 1px solid rgba(255, 255, 255, .3); border-radius: 999px; color: white; background: rgba(255, 255, 255, .08); font: 700 .68rem var(--sans); cursor: pointer; }
+    .copy:hover { background: var(--orange); border-color: var(--orange); }
+
+    footer { padding: 38px 0 50px; border-top: 1px solid var(--line); color: var(--ink-soft); font-size: .75rem; }
+    .footer-row { display: flex; justify-content: space-between; gap: 24px; }
+    footer a { text-underline-offset: .2em; }
+
+    @media (max-width: 800px) {
+      .shell { width: min(100% - 24px, 680px); }
+      .nav-links a:not(:last-child) { display: none; }
+      .hero { padding-top: 72px; }
+      h1 { font-size: clamp(3.7rem, 22vw, 6.8rem); }
+      .authors { line-height: 1.9; }
+      .metric-strip { width: calc(100% - 20px); }
+      .metric span { font-size: .58rem; }
+      section { padding: 68px 0; }
+      .demo { padding-top: 92px; }
+      .demo-grid, .abstract-grid, .results-head, .citation-grid { grid-template-columns: 1fr; gap: 24px; }
+      .demo-copy { order: -1; }
+      .abstract h2 { position: static; }
+      .method-cards { grid-template-columns: 1fr; }
+      .idea { min-height: auto; }
+      .idea::before { margin-bottom: 14px; }
+      .footer-row { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .hero > * { animation: rise .7s both; }
+      .hero > *:nth-child(2) { animation-delay: .08s; }
+      .hero > *:nth-child(3) { animation-delay: .16s; }
+      .hero > *:nth-child(4) { animation-delay: .24s; }
+      .hero > *:nth-child(5) { animation-delay: .32s; }
+      @keyframes rise { from { opacity: 0; transform: translateY(18px); } }
+    }
+  </style>
+</head>
+<body>
+  <header class="shell">
+    <nav class="site-nav" aria-label="Main navigation">
+      <a class="brand" href="#top">CHOREO</a>
+      <div class="nav-links">
+        <a href="#abstract">Abstract</a>
+        <a href="#method">Method</a>
+        <a href="#results">Results</a>
+        <a href="#citation">Citation</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero shell">
+      <div class="eyebrow">Humanoid motion · 2026</div>
+      <h1>CH<span class="orbit">O</span>REO</h1>
+      <p class="subtitle">Every Humanoid Skill as a Trajectory</p>
+      <p class="authors">
+        <span><a href="mailto:sunziyi@stu.ouc.edu.cn">Ziyi Sun</a><sup>1,*</sup></span> ·
+        <span><a href="mailto:cjw6894@stu.ouc.edu.cn">Jingwen Chen</a><sup>2,*</sup></span> ·
+        <span>Yuxi Wang<sup>2,†,‡</sup></span> ·
+        <span>Xiuze Xia<sup>2,†</sup></span> ·
+        <span>Long Cheng<sup>3,4</sup></span> ·
+        <span>Zhaoxiang Zhang<sup>3,4</sup></span> ·
+        <span>Junyu Dong<sup>2</sup></span>
+      </p>
+      <p class="affiliations"><sup>1</sup>College of Engineering, Ocean University of China &nbsp;·&nbsp; <sup>2</sup>Faculty of Information Science and Engineering, Ocean University of China<br><sup>3</sup>University of Chinese Academy of Sciences &nbsp;·&nbsp; <sup>4</sup>Institute of Automation, Chinese Academy of Sciences</p>
+      <p class="contribution"><sup>*</sup>Equal contribution &nbsp; <sup>†</sup>Corresponding authors &nbsp; <sup>‡</sup>Project leader</p>
+      <div class="actions">
+        <a class="button primary" href="paper.pdf">↗ Paper</a>
+        <a class="button" href="#demo">▶ Video</a>
+        <a class="button" href="https://github.com/ziyisun85-ops/Project-choreo">⌘ Code</a>
+      </div>
+    </section>
+
+    <div class="teaser-wrap shell">
+      <div class="teaser-frame">
+        <img src="teaser.png" alt="CHOREO converts motion datasets, reinforcement-learning policies, and generative models into SkillMotion assets for long-horizon humanoid composition." width="1062" height="571">
+      </div>
+      <div class="metric-strip" aria-label="Key results">
+        <div class="metric"><strong>2,950</strong><span>admitted skills</span></div>
+        <div class="metric"><strong>95.4%</strong><span>sequence success</span></div>
+        <div class="metric"><strong>93.8%</strong><span>8-action success</span></div>
+      </div>
+    </div>
+
+    <section class="demo shell" id="demo">
+      <div class="demo-grid">
+        <div class="video-card">
+          <video controls playsinline preload="metadata" poster="teaser.png">
+            <source src="video.mp4" type="video/mp4">
+            Your browser does not support embedded video. <a href="video.mp4">Download the demo</a>.
+          </video>
+        </div>
+        <div class="demo-copy">
+          <div class="section-label">Project video</div>
+          <h2>One runtime.<br>Many origins.</h2>
+          <p class="lede">A user describes the behavior. CHOREO resolves heterogeneous skills, constructs executable transitions, and tracks the resulting long-horizon trajectory on Unitree G1.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="abstract" id="abstract">
+      <div class="shell abstract-grid">
+        <div>
+          <div class="section-label">Abstract</div>
+          <h2>Compose.<br>Do not retrain.</h2>
+        </div>
+        <div>
+          <p>Humanoid skills are increasingly capable—and increasingly siloed by incompatible representations, interfaces, and controllers.</p>
+          <p>CHOREO is a framework for training-free composition of heterogeneous humanoid skills. Its key observation is simple: regardless of how a skill is learned, it can ultimately be expressed as an executable motion trajectory. CHOREO converts each capability into <strong>SkillMotion</strong>, a unified representation that combines motion states, contacts, semantics, and boundary conditions.</p>
+          <p>Skills are composed through direct continuation, cubic Hermite blending, or validated bridge motions, without retraining source models or updating models at test time. On Unitree G1 in MuJoCo, CHOREO organizes 2,950 admitted SkillMotion assets and achieves 95.4% sequence success across 130 multi-action tasks, including 93.8% success on eight-action sequences.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="shell" id="method">
+      <div class="section-label">Method</div>
+      <h2>Trajectories become<br>a common language.</h2>
+      <figure class="method-figure">
+        <img src="overview.png" alt="CHOREO pipeline: language task planning, SkillMotion retrieval and composition, then continuous humanoid execution." width="1039" height="433" loading="lazy">
+        <figcaption>CHOREO separates offline asset ingestion from online planning, retrieval, transition construction, and continuous execution.</figcaption>
+      </figure>
+      <div class="method-cards">
+        <article class="idea">
+          <h3>SkillMotion</h3>
+          <p>A canonical executable trajectory enriched with contact state, semantics, boundary descriptors, provenance, and validation evidence.</p>
+        </article>
+        <article class="idea">
+          <h3>Tracker-aware execution</h3>
+          <p>Each registered asset is paired with a compatible frozen tracker, decoupling the skill representation from controller implementation.</p>
+        </article>
+        <article class="idea">
+          <h3>Adaptive transitions</h3>
+          <p>Compatible skills continue directly; nearby boundaries use cubic Hermite blending; difficult gaps retrieve and validate a bridge motion.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="results" id="results">
+      <div class="shell">
+        <div class="results-head">
+          <div>
+            <div class="section-label">Results</div>
+            <h2>Reliability that survives the long horizon.</h2>
+          </div>
+          <p class="result-callout">Across 552 planned skill boundaries, CHOREO reaches a 96.7% switch success rate while reducing falls to 4.6%. Its advantage grows as sequences get longer.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Method</th><th>2-action</th><th>3-action</th><th>5-action</th><th>8-action</th><th>Switch SR</th><th>Fall rate</th><th>Δq (rad)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Direct Switching</td><td>75.0%</td><td>61.5%</td><td>58.3%</td><td>14.6%</td><td>67.2%</td><td>54.6%</td><td>0.0449</td></tr>
+              <tr><td>Fixed Hermite</td><td>85.0%</td><td>69.2%</td><td>44.4%</td><td>22.9%</td><td>68.8%</td><td>52.3%</td><td>0.0178</td></tr>
+              <tr><td>Fixed Stand Bridge</td><td>70.0%</td><td>73.1%</td><td>63.9%</td><td>41.7%</td><td>72.6%</td><td>41.5%</td><td>0.0180</td></tr>
+              <tr><td>Motion Matching</td><td>80.0%</td><td>73.1%</td><td>61.1%</td><td>31.2%</td><td>75.2%</td><td>44.6%</td><td>0.0171</td></tr>
+              <tr class="choreo"><td>CHOREO</td><td>100.0%</td><td>100.0%</td><td>91.7%</td><td>93.8%</td><td>96.7%</td><td>4.6%</td><td>0.0170</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="shell" id="citation">
+      <div class="citation-grid">
+        <div>
+          <div class="section-label">Citation</div>
+          <h2>Cite<br>CHOREO.</h2>
+          <p>If this project is useful in your research, please cite the paper.</p>
+        </div>
+        <div class="bibtex">
+          <button class="copy" type="button" aria-label="Copy BibTeX">Copy</button>
+          <pre id="bibtex">@misc{sun2026choreo,
+  title  = {CHOREO: Every Humanoid Skill as a Trajectory},
+  author = {Sun, Ziyi and Chen, Jingwen and Wang, Yuxi and
+            Xia, Xiuze and Cheng, Long and Zhang, Zhaoxiang and
+            Dong, Junyu},
+  year   = {2026}
+}</pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell footer-row">
+      <span>© 2026 CHOREO authors.</span>
+      <span>Structure inspired by the <a href="https://horwitz.ai/probex">ProbeX project page</a> and the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template">Academic Project Page Template</a>.</span>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelector('.copy').addEventListener('click', async (event) => {
+      await navigator.clipboard.writeText(document.querySelector('#bibtex').textContent);
+      event.currentTarget.textContent = 'Copied';
+      setTimeout(() => event.currentTarget.textContent = 'Copy', 1400);
+    });
+  </script>
+</body>
+</html>
