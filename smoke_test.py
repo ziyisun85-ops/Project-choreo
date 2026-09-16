@@ -19,6 +19,6 @@ class Assets(HTMLParser):
 html = Path("index.html").read_text(encoding="utf-8")
 assets = Assets()
 assets.feed(html)
-assert "CHOREO — Every Humanoid Skill as a Trajectory" in html
+assert "CHOREO: Every Humanoid Skill as a Trajectory" in html
 assert all(Path(path).is_file() for path in assets.paths), assets.paths
 print(f"OK: index.html and {len(assets.paths)} local asset references")
